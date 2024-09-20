@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.permissions import DjangoModelPermissionsOrAnonReadOnly
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
 from rest_framework import status
 from django.db import models
 from .models import Device, Event
@@ -38,7 +39,7 @@ class DeviceAPIView(APIView):
     - Deactivate a device:
         POST /devices/{id}/deactivate/
     """
-    permission_classes = [DjangoModelPermissionsOrAnonReadOnly] 
+    permission_classes = [AllowAny] 
 
     def get_queryset(self):
         """
@@ -96,6 +97,7 @@ class DeviceAPIView(APIView):
             - 201 Created: If the device is successfully created.
             - 400 Bad Request: If the request data is invalid.
         """
+
         serializer = DeviceSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -113,6 +115,7 @@ class DeviceAPIView(APIView):
         Returns:
             Response: A JSON representation of the updated device or an error message.
         """
+
         try:
             device = Device.objects.get(pk=pk)
             serializer = DeviceSerializer(device, data=request.data, partial=True)
@@ -135,6 +138,7 @@ class DeviceAPIView(APIView):
             Response: A 204 No Content status if the device was successfully deleted, 
                       or a 404 Not Found status if the device does not exist.
         """
+
         try:
             device = Device.objects.get(pk=pk)
             device.delete()
@@ -153,6 +157,7 @@ class DeviceAPIView(APIView):
         Returns:
             Response: A success message or an error message.
         """
+
         try:
             device = EventService.activate_device(pk)
             return Response({'status': f'Device {device.name} activated'}, status=status.HTTP_200_OK)
@@ -170,6 +175,7 @@ class DeviceAPIView(APIView):
         Returns:
             Response: A success message or an error message.
         """
+
         try:
             device = EventService.deactivate_device(pk)
             return Response({'status': f'Device {device.name} deactivated'}, status=status.HTTP_200_OK)
