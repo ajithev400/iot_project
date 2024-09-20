@@ -70,7 +70,7 @@ class DeviceAPIView(APIView):
             serializer = DeviceSerializer(devices, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def post(self, request):
+    def post(self, request, pk=None):
         """
         Create a new device.
 
@@ -97,7 +97,12 @@ class DeviceAPIView(APIView):
             - 201 Created: If the device is successfully created.
             - 400 Bad Request: If the request data is invalid.
         """
-
+        # Check if the request is for activation or deactivation
+        if request.path.endswith('/activate/'):
+            return self.post_activate(request, pk)
+        elif request.path.endswith('/deactivate/'):
+            return self.post_deactivate(request, pk)
+         
         serializer = DeviceSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
